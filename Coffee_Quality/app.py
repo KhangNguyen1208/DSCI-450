@@ -6,18 +6,14 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="Coffee Quality Explorer", page_icon="☕", layout="wide")
 
-# Resolve the CSV path relative to this script's own location, not the
-# process's working directory (Streamlit Cloud runs from the repo root,
-# which breaks a plain relative path when app.py lives in a subfolder).
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "coffee.csv")
 
-# ---------- COFFEE-THEMED PALETTE ----------
+# Theme
 COFFEE_COLORS = ["#C08552", "#DDB892", "#7F5539", "#9C6644", "#B08968", "#E6CCB2", "#603813"]
 CHART_TEMPLATE = "plotly_dark"
 PLOT_BG = "#1B120E"
 
-# ---------- CUSTOM CSS ----------
 st.markdown(
     """
     <style>
@@ -43,8 +39,7 @@ st.markdown(
 def load_data():
     df = pd.read_csv(DATA_PATH)
     return df
-
-# ISO-3 codes for the map (needed since the raw country names don't all match plotly's built-in list)
+    
 ISO3 = {
     "Brazil": "BRA", "Burundi": "BDI", "China": "CHN", "Colombia": "COL",
     "Costa Rica": "CRI", "Cote d?Ivoire": "CIV", "Ecuador": "ECU", "El Salvador": "SLV",
@@ -61,7 +56,7 @@ ISO3 = {
 df = load_data()
 df["iso3"] = df["country"].map(ISO3)
 
-# ---------- HEADER ----------
+# Header
 st.title("☕ Coffee Quality Explorer")
 st.markdown(
     "Explore **1,300+ Arabica coffees** professionally graded by the "
@@ -69,7 +64,7 @@ st.markdown(
     "Filter by origin and processing method, hover the map, and see what actually drives a great cup."
 )
 
-# ---------- SIDEBAR FILTERS ----------
+# Sidebar
 st.sidebar.header("☕ Filters")
 
 countries = sorted(df["country"].dropna().unique())
@@ -95,7 +90,7 @@ filtered = df[
 
 st.sidebar.markdown(f"**{len(filtered)} coffees** match your filters")
 
-# ---------- TOP METRICS ----------
+# Metrics
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Coffees shown", len(filtered))
 col2.metric("Avg. score", f"{filtered['total_score'].mean():.1f}" if len(filtered) else "–")
@@ -104,7 +99,7 @@ col4.metric("Countries", filtered["country"].nunique())
 
 st.divider()
 
-# ---------- WORLD MAP (always shows ALL countries, hover for stats) ----------
+# World Map
 st.subheader("🗺️ Where the coffee comes from")
 st.caption("Hover any country to see its average score, coffee count, and top variety. This map always shows the full dataset, regardless of sidebar filters.")
 
@@ -164,7 +159,7 @@ st.plotly_chart(fig_map, use_container_width=True)
 
 st.divider()
 
-# ---------- CHARTS ----------
+# Charts
 left, right = st.columns(2)
 
 with left:
@@ -214,7 +209,7 @@ else:
 
 st.divider()
 
-# ---------- LEADERBOARD ----------
+# Leaderboard
 st.subheader("🏆 Top-rated coffees (current filters)")
 top = filtered.sort_values("total_score", ascending=False).head(10)
 st.dataframe(
