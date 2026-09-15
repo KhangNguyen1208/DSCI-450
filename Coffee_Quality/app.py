@@ -1,9 +1,16 @@
+import os
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
 st.set_page_config(page_title="Coffee Quality Explorer", page_icon="☕", layout="wide")
+
+# Resolve the CSV path relative to this script's own location, not the
+# process's working directory (Streamlit Cloud runs from the repo root,
+# which breaks a plain relative path when app.py lives in a subfolder).
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(BASE_DIR, "coffee.csv")
 
 # ---------- COFFEE-THEMED PALETTE ----------
 COFFEE_COLORS = ["#C08552", "#DDB892", "#7F5539", "#9C6644", "#B08968", "#E6CCB2", "#603813"]
@@ -34,7 +41,7 @@ st.markdown(
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("coffee.csv")
+    df = pd.read_csv(DATA_PATH)
     return df
 
 # ISO-3 codes for the map (needed since the raw country names don't all match plotly's built-in list)
